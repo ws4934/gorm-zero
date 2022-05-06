@@ -1,4 +1,4 @@
-module github.com/ws4934/gorm-zero
+module github.com/SpectatorNan/gorm-zero
 
 go 1.16
 
