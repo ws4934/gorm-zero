@@ -163,16 +163,12 @@ func (cc CachedConn) QueryRowIndex(v interface{}, key string, keyer func(primary
 func (cc CachedConn) QueryRowIndexCtx(ctx context.Context, v interface{}, key string, keyer func(primary interface{}) string, indexQuery IndexQueryCtxFn, primaryQuery PrimaryQueryCtxFn) error {
 	ctx, span := startSpan(ctx)
 	defer span.End()
-
 	var primaryKey interface{}
-	var found bool
-
 	if err := cc.cache.TakeWithExpireCtx(ctx, &primaryKey, key, func(val interface{}, expire time.Duration) (err error) {
 		primaryKey, err = indexQuery(cc.db.WithContext(ctx), v)
 		if err != nil {
 			return err
 		}
-		found = true
 		return cc.cache.SetWithExpireCtx(ctx, keyer(primaryKey), v, expire+cacheSafeGapBetweenIndexAndPrimary)
 	}); err != nil {
 		return err
